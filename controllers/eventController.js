@@ -18,7 +18,7 @@ exports.createEvent = async (req, res) => {
       date,
       
     });
-cd 
+
     await event.save();
     res.status(201).json({ success: true, data: event });
 

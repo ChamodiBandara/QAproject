@@ -1,0 +1,48 @@
+const request = require("supertest");
+const { expect } = require("chai");
+const app = require("../app");
+const mongoose = require("mongoose");
+
+describe("Event API", function () {
+  let eventId;
+
+//connect to the database before running tests
+  before(async function () {
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGO_URI);
+    }
+  });
+
+  it("should create a new event", async function () {
+    const res = await request(app)
+      .post("/api/events")
+      .send({
+        name: "Test Event",
+        location: "Test Hall",
+        date: "2025-09-01T10:00:00.000Z",
+      });
+
+    expect(res.status).to.equal(201);
+    expect(res.body).to.have.property("success", true);
+    expect(res.body.data).to.have.property("_id");
+    eventId = res.body.data._id;
+  });
+
+  it("should get all events", async function () {
+    const res = await request(app).get("/api/events");
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property("success", true);
+    expect(res.body).to.have.property("count").that.is.a("number");
+    expect(res.body).to.have.property("data").that.is.an("array");
+  });
+
+  it("should get event by ID", async function () {
+    const res = await request(app).get(`/api/events/${eventId}`);
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property("success", true);
+    expect(res.body.data).to.have.property("_id", eventId);
+  });
+
+});
