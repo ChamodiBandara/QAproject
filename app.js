@@ -1,36 +1,34 @@
-require('dotenv').config();  // Load environment variables
-const express = require('express'); // Express framework
-const cors = require('cors'); // CORS middleware
-const connectDB = require('./Config/db.js'); // MongoDB connection
+// app.js
+import dotenv from "dotenv";
+dotenv.config();
 
-// Import route files
-const eventsRoute = require('./routes/events');
-const adminRoute = require('./routes/admin');
+import express from "express";
+import cors from "cors";
+import connectDB from "./Config/db.js";
 
-const app = express(); // Create Express app
+// Import routes
+import eventsRoute from "./routes/events.js";
+import adminRoute from "./routes/admin.js";
+
+const app = express();
 
 // Connect to MongoDB
 connectDB().catch(err => {
-  console.error('Failed to connect to MongoDB:', err);
+  console.error("Failed to connect to MongoDB:", err);
   process.exit(1);
 });
 
 // Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(express.json()); // Parse JSON requests
+app.use(cors());
+app.use(express.json());
 
 // Routes
-app.use("/api/events", eventsRoute); // Event CRUD routes
-app.use("/api/admin", adminRoute);   // Admin routes
+app.use("/api/events", eventsRoute);
+app.use("/api/admin", adminRoute);
 
-// Health check route
-app.get('/', (req, res) => res.send('University Event Management API is running'));
+// Health check
+app.get("/", (req, res) => {
+  res.send("University Event Management API is running");
+});
 
-// Start server only if this file is run directly
-const PORT = process.env.PORT || 5000;
-if (require.main === module) {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}
-
-// Export app for testing
-module.exports = app;
+export default app; // export for tests

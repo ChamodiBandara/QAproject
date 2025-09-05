@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+// models/Admin.js
+import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema(
   {
@@ -6,12 +7,10 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add firstName"],
     },
-    lastName:{
+    lastName: {
       type: String,
       required: [true, "Please add lastName"],
-
     },
-
     email: {
       type: String,
       required: [true, "Please add an email"],
@@ -25,4 +24,4 @@ const adminSchema = new mongoose.Schema(
   { timestamps: true } // automatically adds createdAt and updatedAt
 );
 
-module.exports = mongoose.model("Admin", adminSchema);
+export default mongoose.model("Admin", adminSchema);

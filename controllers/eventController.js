@@ -1,7 +1,8 @@
-const Event = require("../models/Event");
+// controllers/eventController.js
+import Event from "../models/Event.js"; // note .js extension
 
 // Create a new event
-exports.createEvent = async (req, res) => {
+export const createEvent = async (req, res) => {
   try {
     const { name, location, date } = req.body;
 
@@ -12,24 +13,21 @@ exports.createEvent = async (req, res) => {
       });
     }
 
-    const event = new Event({
-      name,
-      location,
-      date,
-      
-    });
-
+    const event = new Event({ name, location, date });
     await event.save();
-    res.status(201).json({ success: true, data: event });
 
+    res.status(201).json({ success: true, data: event });
   } catch (err) {
     console.error("Create Event Error:", err);
-    res.status(500).json({ success: false, error: "Server error while creating event" });
+    res.status(500).json({
+      success: false,
+      error: "Server error while creating event",
+    });
   }
 };
 
 // Get all events
-exports.getEvents = async (req, res) => {
+export const getEvents = async (req, res) => {
   try {
     const events = await Event.find().sort({ date: -1 });
     res.json({ success: true, count: events.length, data: events });
@@ -39,7 +37,7 @@ exports.getEvents = async (req, res) => {
 };
 
 // Get single event by ID
-exports.getEventById = async (req, res) => {
+export const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) {
@@ -52,11 +50,9 @@ exports.getEventById = async (req, res) => {
 };
 
 // Update event
-exports.updateEvent = async (req, res) => {
+export const updateEvent = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const updatedEvent = await Event.findByIdAndUpdate(id, req.body, {
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -68,12 +64,15 @@ exports.updateEvent = async (req, res) => {
     res.status(200).json({ success: true, data: updatedEvent });
   } catch (err) {
     console.error("Update Event Error:", err);
-    res.status(500).json({ success: false, error: "Server error while updating event" });
+    res.status(500).json({
+      success: false,
+      error: "Server error while updating event",
+    });
   }
 };
 
 // Delete event
-exports.deleteEvent = async (req, res) => {
+export const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
     if (!event) {

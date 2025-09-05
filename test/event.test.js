@@ -1,16 +1,22 @@
-const request = require("supertest");
-const { expect } = require("chai");
-const app = require("../app");
-const mongoose = require("mongoose");
+import dotenv from "dotenv";
+dotenv.config();
+import request from "supertest";
+import { expect } from "chai";
+import app from "../app.js";
+import mongoose from "mongoose";
 
 describe("Event API", function () {
   let eventId;
 
-//connect to the database before running tests
   before(async function () {
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(process.env.MONGO_URI);
     }
+    await mongoose.connection.db.dropDatabase();
+  });
+
+  after(async function () {
+    await mongoose.disconnect();
   });
 
   it("should create a new event", async function () {
@@ -44,5 +50,4 @@ describe("Event API", function () {
     expect(res.body).to.have.property("success", true);
     expect(res.body.data).to.have.property("_id", eventId);
   });
-
 });

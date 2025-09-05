@@ -1,13 +1,14 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
+// controllers/adminController.js
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import Admin from "../models/Admin.js"; // note the .js extension
 
 // @desc    Signup a new admin
 // @route   POST /api/admin/signup
 // @access  Public
-const signupAdmin = async (req, res) => {
+export const signupAdmin = async (req, res) => {
   try {
-    const { firstName,lastName, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     // check if admin already exists
     const adminExists = await Admin.findOne({ email });
@@ -20,20 +21,20 @@ const signupAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // create new admin
-  const admin = await Admin.create({
-  firstName,  
-  lastName, 
-  email,
-  password: hashedPassword,
-});
+    const admin = await Admin.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
 
     if (admin) {
-   res.status(201).json({
-  _id: admin.id,
-  firstName: admin.firstName,
-  lastName: admin.lastName,
-  email: admin.email,
-});
+      res.status(201).json({
+        _id: admin.id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+      });
     } else {
       res.status(400).json({ message: "Invalid admin data" });
     }
@@ -45,7 +46,7 @@ const signupAdmin = async (req, res) => {
 // @desc    Login admin
 // @route   POST /api/admin/login
 // @access  Public
-const loginAdmin = async (req, res) => {
+export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -55,7 +56,9 @@ const loginAdmin = async (req, res) => {
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.json({
       _id: admin.id,
@@ -68,5 +71,3 @@ const loginAdmin = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-module.exports = { signupAdmin, loginAdmin };
