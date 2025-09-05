@@ -8,16 +8,19 @@ import mongoose from "mongoose";
 describe("Event API", function () {
   let eventId;
 
-  before(async function () {
-    if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGO_URI);
-    }
-    await mongoose.connection.db.dropDatabase();
-  });
+ before(async function () {
+  // Connect to your main database
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(process.env.MONGO_URI);
+  }
 
-  after(async function () {
-    await mongoose.disconnect();
-  });
+  // Optional: clear only the events collection
+  await mongoose.connection.collection("events").deleteMany({});
+});
+
+after(async function () {
+  await mongoose.connection.close();
+});
 
   it("should create a new event", async function () {
     const res = await request(app)
